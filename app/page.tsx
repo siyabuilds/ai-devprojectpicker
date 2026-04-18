@@ -1,0 +1,163 @@
+"use client";
+
+import { useState } from "react";
+import { Search, Loader2, User, Briefcase, ChevronRight, AlertCircle } from "lucide-react";
+
+type ProjectResult = {
+  name: string;
+  url: string;
+  matchScore: number;
+  explanation: string;
+  keyMetrics: string[];
+};
+
+export default function Home() {
+  const [username, setUsername] = useState("");
+  const [jobDescription, setJobDescription] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [results, setResults] = useState<ProjectResult[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleAnalyze = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!username || !jobDescription) return;
+
+    setLoading(true);
+    setError(null);
+    setResults(null);
+
+    try {
+      const response = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, jobDescription }),
+      });
+
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.error || "Failed to analyze projects");
+      }
+
+      const data = await response.json();
+      setResults(data.projects);
+    } catch (err: Error | unknown) {
+      setError(err instanceof Error ? err.message : "An unknown error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <main className="container">
+      <div className="header">
+        <h1>AI Project Picker</h1>
+        <p>Optimize your CV by automatically matching your best GitHub projects against any job description.</p>
+      </div>
+
+      <div className="main-content">
+        <div className="card">
+          <form onSubmit={handleAnalyze}>
+            <div className="form-group">
+              <label className="form-label" htmlFor="username">
+                <User size={16} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'text-bottom' }} />
+                GitHub Username
+              </label>
+              <input
+                id="username"
+                type="text"
+                className="form-input"
+                placeholder="e.g. torvalds"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label" htmlFor="jobDescription">
+                <Briefcase size={16} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'text-bottom' }} />
+                Job Description
+              </label>
+              <textarea
+                id="jobDescription"
+                className="form-textarea"
+                placeholder="Paste the job requirements and description here..."
+                value={jobDescription}
+                onChange={(e) => setJobDescription(e.target.value)}
+                required
+              />
+            </div>
+
+            <button type="submit" className="btn" disabled={loading || !username || !jobDescription}>
+              {loading ? (
+                <>
+                  <Loader2 className="spinner" size={20} />
+                  Analyzing...
+                </>
+              ) : (
+                <>
+                  <Search size={20} />
+                  Find Best Projects
+                </>
+              )}
+            </button>
+          </form>
+
+          {error && (
+            <div className="error-message" style={{ marginTop: '1.5rem' }}>
+              <AlertCircle size={16} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'text-bottom' }} />
+              {error}
+            </div>
+          )}
+        </div>
+
+        <div>
+          {results ? (
+            <div className="results">
+              <h2 style={{ marginBottom: '1rem', fontSize: '1.5rem', fontWeight: 600 }}>Top Matches for CV</h2>
+              {results.length === 0 ? (
+                <div className="empty-state">
+                  <AlertCircle size={48} className="empty-icon" />
+                  <h3>No matching projects found</h3>
+                  <p style={{ marginTop: '0.5rem' }}>Try refining your job description or checking the GitHub username.</p>
+                </div>
+              ) : (
+                results.map((project, idx) => (
+                  <div key={idx} className="result-card" style={{ animationDelay: `${idx * 0.1}s` }}>
+                    <div className="result-header">
+                      <div className="result-title">
+                        <a href={project.url} target="_blank" rel="noopener noreferrer">
+                          {project.name}
+                        </a>
+                      </div>
+                      <div className="match-score">{project.matchScore}% Match</div>
+                    </div>
+                    
+                    <div className="explanation">
+                      <ChevronRight size={16} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'text-bottom', color: 'var(--primary-color)' }} />
+                      {project.explanation}
+                    </div>
+
+                    <div className="metrics-container">
+                      {project.keyMetrics.map((metric, mIdx) => (
+                        <span key={mIdx} className="metric-badge">
+                          {metric}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          ) : (
+            <div className="empty-state">
+              <Search size={48} className="empty-icon" />
+              <h3>Awaiting Input</h3>
+              <p style={{ marginTop: '0.5rem' }}>Enter a username and job description to see your best matching projects.</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </main>
+  );
+}
