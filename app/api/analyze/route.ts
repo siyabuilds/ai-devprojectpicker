@@ -88,6 +88,28 @@ export async function POST(req: Request) {
       topics: repo.topics || [],
     }));
 
+    // Fetch user's profile README if it exists
+    let profileReadme = "";
+    try {
+      const readmeRes = await fetch(
+        `https://api.github.com/repos/${username}/${username}/readme`,
+        {
+          headers: {
+            Authorization: `Bearer ${githubApiKey}`,
+            Accept: "application/vnd.github.v3.raw",
+          },
+        }
+      );
+      if (readmeRes.ok) {
+        profileReadme = await readmeRes.text();
+        if (profileReadme.length > 3000) {
+          profileReadme = profileReadme.substring(0, 3000) + "...";
+        }
+      }
+    } catch (e) {
+      console.error("Failed to fetch profile README for", username);
+    }
+
     // 2. Call OpenAI API for comparison
     const openai = new OpenAI({ apiKey: openaiApiKey });
 
@@ -104,12 +126,14 @@ For each selected project, you must provide:
 - A 1-2 sentence explanation of why this project should be highlighted on the CV for this specific role.
 - 2-4 key metrics or skills demonstrated in the project that match the job description (e.g. "React", "REST API", "State Management").
 
-Additionally, you must provide a "Professional summary" that incorporates the candidate's skills, highlights the selected projects, and perfectly aligns with the job description. IMPORTANT: Do NOT use academic or junior-level terminology such as "intern", "graduate", "student", etc. Focus solely on the characteristics in the projects that align with the job responsibilities and technical requirements. The summary should follow a tone similar to:
+Additionally, you must provide a "Professional summary" that incorporates the candidate's skills, highlights the selected projects, perfectly aligns with the job description, and draws upon their Profile README if provided to capture their personal tone and background. IMPORTANT: Do NOT use academic or junior-level terminology such as "intern", "graduate", "student", etc. Focus solely on the characteristics in the projects that align with the job responsibilities and technical requirements. The summary should follow a tone similar to:
 "Full stack developer specializing in building internal systems, workflow automation, and scalable software solutions. Proven ability to design and deliver tools that improve operational efficiency and reduce manual processes. Experienced in API integration, semantic search, and data-driven systems, with a strong focus on performance, usability, and real-world impact."`
         },
         {
           role: "user",
-          content: `Job Description:\n${jobDescription}\n\nCandidate's Repositories:\n${JSON.stringify(repoSummaries, null, 2)}`
+          content: `Job Description:\n${jobDescription}\n` +
+            (profileReadme ? `\nCandidate's Profile README:\n${profileReadme}\n` : "") +
+            `\nCandidate's Repositories:\n${JSON.stringify(repoSummaries, null, 2)}`
         }
       ],
       response_format: {
