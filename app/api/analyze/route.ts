@@ -1,6 +1,17 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
+interface GitHubRepo {
+  name: string;
+  homepage?: string | null;
+  has_pages?: boolean;
+  description?: string | null;
+  language?: string | null;
+  html_url: string;
+  topics?: string[];
+  [key: string]: unknown;
+}
+
 export async function POST(req: Request) {
   try {
     const { username, jobDescription } = await req.json();
@@ -48,11 +59,11 @@ export async function POST(req: Request) {
 
     // Filter 1: Must have a live link / deployed demo
     const reposWithDemo = allRepos.filter(
-      (repo: any) => (repo.homepage && repo.homepage.trim() !== "") || repo.has_pages
+      (repo: GitHubRepo) => (repo.homepage && repo.homepage.trim() !== "") || repo.has_pages
     );
 
     // Filter 2: Must have at least 5+ commits
-    const validRepos = [];
+    const validRepos: GitHubRepo[] = [];
     for (const repo of reposWithDemo) {
       try {
         const commitRes = await fetch(
@@ -80,7 +91,7 @@ export async function POST(req: Request) {
     }
 
     // Filter relevant fields to save tokens
-    const repoSummaries = validRepos.map((repo: any) => ({
+    const repoSummaries = validRepos.map((repo: GitHubRepo) => ({
       name: repo.name,
       description: repo.description || "No description",
       language: repo.language,
@@ -176,10 +187,10 @@ Additionally, you must provide a "Professional summary" that incorporates the ca
     const parsedResult = JSON.parse(resultText);
 
     return NextResponse.json(parsedResult);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("API Error:", error);
     return NextResponse.json(
-      { error: error.message || "Internal server error" },
+      { error: error instanceof Error ? error.message : "Internal server error" },
       { status: 500 }
     );
   }
