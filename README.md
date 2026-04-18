@@ -1,36 +1,98 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Dev Project Picker 🚀
 
-## Getting Started
+**Live Demo:** [https://ai-devprojectpicker.vercel.app/](https://ai-devprojectpicker.vercel.app/)
 
-First, run the development server:
+Welcome to the **AI Dev Project Picker**! This is a Next.js application designed to help developers figure out exactly which of their GitHub projects they should highlight for a specific job application. 
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+By simply entering your GitHub username and the job description you're applying for, this app fetches your recent repositories, analyzes them using OpenAI, and recommends the best portfolio pieces to showcase.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ✨ Features
+- **Automated Repository Fetching**: Pulls your latest open-source work directly from GitHub.
+- **AI-Powered Match Analysis**: Reads through a target job description and finds the projects that fit best.
+- **Slick, Modern UI**: Built with Next.js 16 (React 19), TailwindCSS v4, and smoothly animated with Framer Motion.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🛠 Tech Stack
+- **Framework**: Next.js (App Router)
+- **Styling**: Tailwind CSS
+- **Animations**: Framer Motion
+- **Icons**: Lucide React
+- **AI/APIs**: OpenAI API, GitHub REST API
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 💻 Getting Started
 
-To learn more about Next.js, take a look at the following resources:
+To get a local copy up and running, follow these simple steps.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Prerequisites
+You'll need Node.js installed on your machine and a couple of API keys:
+1. **GitHub Personal Access Token**: Create one [here](https://github.com/settings/tokens) (no special scopes needed for public repos, but useful for avoiding rate limits).
+2. **OpenAI API Key**: Grab one from the [OpenAI Platform](https://platform.openai.com/api-keys).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Installation
 
-## Deploy on Vercel
+1. **Clone the repo:**
+   ```bash
+   git clone https://github.com/siyabuilds/ai-devprojectpicker.git
+   cd ai-devprojectpicker
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+2. **Install dependencies:**
+   ```bash
+   npm install
+   # or yarn / pnpm / bun
+   ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+3. **Set up Environment Variables:**
+   Create a `.env.local` file in the root directory and add your API keys:
+   ```env
+   GITHUB_API_KEY=your_github_token_here
+   OPENAI_API_KEY=your_openai_api_key_here
+   ```
+
+4. **Run the development server:**
+   ```bash
+   npm run dev
+   ```
+   Open [http://localhost:3000](http://localhost:3000) to check it out!
+
+---
+
+## 🎯 How to Use It
+
+1. Load up the application.
+2. Enter your **GitHub Username** in the designated input field.
+3. Paste the **Job Description** of the role you're applying for.
+4. Hit **Analyze**. The app will do the heavy lifting, comparing your repositories to the role's requirements, and present you with the best projects to feature on your application!
+
+---
+
+## 🚀 How to Deploy
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new).
+
+1. Push your code to your GitHub repository.
+2. Sign in to Vercel and click **Add New...** -> **Project**.
+3. Import this repository.
+4. **Important**: In the configuration settings, add your Environment Variables (`GITHUB_API_KEY` and `OPENAI_API_KEY`).
+5. Click **Deploy**. That's it! 
+
+You can also deploy anywhere else that supports Next.js (Netlify, AWS Amplify, Docker, etc.). 
+
+---
+
+## 🤝 Contributing & Pull Requests
+
+Have an idea to make this tool even better? Spotted a bug? **Pull Requests are more than welcome!** 
+
+Whether it's a UI improvement, a more efficient AI prompt, or a brand new feature, I'd love to see what you come up with. 
+
+**To contribute:**
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request!
+
+If you're ever uncertain about a feature, feel free to open an Issue first to discuss it.
+
