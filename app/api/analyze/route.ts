@@ -24,7 +24,7 @@ export async function POST(req: Request) {
 
     // 1. Fetch repositories from GitHub
     const githubRes = await fetch(
-      `https://api.github.com/users/${username}/repos?sort=updated&per_page=15`,
+      `https://api.github.com/users/${username}/repos?sort=updated&per_page=30`,
       {
         headers: {
           Authorization: `Bearer ${githubApiKey}`,
@@ -40,14 +40,47 @@ export async function POST(req: Request) {
       );
     }
 
-    const repos = await githubRes.json();
+    const allRepos = await githubRes.json();
 
-    if (!repos || repos.length === 0) {
-      return NextResponse.json({ projects: [] });
+    if (!allRepos || allRepos.length === 0) {
+      return NextResponse.json({ projects: [], summary: "" });
+    }
+
+    // Filter 1: Must have a live link / deployed demo
+    const reposWithDemo = allRepos.filter(
+      (repo: any) => (repo.homepage && repo.homepage.trim() !== "") || repo.has_pages
+    );
+
+    // Filter 2: Must have at least 5+ commits
+    const validRepos = [];
+    for (const repo of reposWithDemo) {
+      try {
+        const commitRes = await fetch(
+          `https://api.github.com/repos/${username}/${repo.name}/commits?per_page=5`,
+          {
+            headers: {
+              Authorization: `Bearer ${githubApiKey}`,
+              Accept: "application/vnd.github.v3+json",
+            },
+          }
+        );
+        if (commitRes.ok) {
+          const commits = await commitRes.json();
+          if (Array.isArray(commits) && commits.length >= 5) {
+            validRepos.push(repo);
+          }
+        }
+      } catch (e) {
+        console.error("Failed to fetch commits for repo", repo.name);
+      }
+    }
+
+    if (validRepos.length === 0) {
+      return NextResponse.json({ projects: [], summary: "" });
     }
 
     // Filter relevant fields to save tokens
-    const repoSummaries = repos.map((repo: any) => ({
+    const repoSummaries = validRepos.map((repo: any) => ({
       name: repo.name,
       description: repo.description || "No description",
       language: repo.language,
@@ -69,7 +102,10 @@ For each selected project, you must provide:
 - The project name and URL.
 - A match score out of 100 representing how well the project aligns with the job requirements.
 - A 1-2 sentence explanation of why this project should be highlighted on the CV for this specific role.
-- 2-4 key metrics or skills demonstrated in the project that match the job description (e.g. "React", "REST API", "State Management").`
+- 2-4 key metrics or skills demonstrated in the project that match the job description (e.g. "React", "REST API", "State Management").
+
+Additionally, you must provide a "Professional summary" that incorporates the candidate's skills, highlights the selected projects, and perfectly aligns with the job description. IMPORTANT: Do NOT use academic or junior-level terminology such as "intern", "graduate", "student", etc. Focus solely on the characteristics in the projects that align with the job responsibilities and technical requirements. The summary should follow a tone similar to:
+"Full stack developer specializing in building internal systems, workflow automation, and scalable software solutions. Proven ability to design and deliver tools that improve operational efficiency and reduce manual processes. Experienced in API integration, semantic search, and data-driven systems, with a strong focus on performance, usability, and real-world impact."`
         },
         {
           role: "user",
@@ -83,6 +119,7 @@ For each selected project, you must provide:
           schema: {
             type: "object",
             properties: {
+              summary: { type: "string" },
               projects: {
                 type: "array",
                 items: {
@@ -99,7 +136,7 @@ For each selected project, you must provide:
                 }
               }
             },
-            required: ["projects"],
+            required: ["summary", "projects"],
             additionalProperties: false
           },
           strict: true

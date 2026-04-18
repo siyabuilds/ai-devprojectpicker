@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Search, Loader2, User, Briefcase, ChevronRight, AlertCircle } from "lucide-react";
+import { motion } from "framer-motion";
 
 type ProjectResult = {
   name: string;
@@ -9,13 +10,18 @@ type ProjectResult = {
   matchScore: number;
   explanation: string;
   keyMetrics: string[];
+  };
+
+type AnalysisResult = {
+  summary: string;
+  projects: ProjectResult[];
 };
 
 export default function Home() {
   const [username, setUsername] = useState("");
   const [jobDescription, setJobDescription] = useState("");
   const [loading, setLoading] = useState(false);
-  const [results, setResults] = useState<ProjectResult[] | null>(null);
+  const [results, setResults] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const handleAnalyze = async (e: React.FormEvent) => {
@@ -39,7 +45,7 @@ export default function Home() {
       }
 
       const data = await response.json();
-      setResults(data.projects);
+      setResults({ summary: data.summary || "", projects: data.projects });
     } catch (err: Error | unknown) {
       setError(err instanceof Error ? err.message : "An unknown error occurred");
     } finally {
@@ -114,15 +120,36 @@ export default function Home() {
         <div>
           {results ? (
             <div className="results">
+              <div style={{ position: "relative", marginBottom: "0.5rem", borderRadius: "1rem", overflow: "hidden", padding: "4px" }}>
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ repeat: Infinity, duration: 4, ease: "linear" }}
+                  style={{
+                    position: "absolute",
+                    top: "-50%",
+                    left: "-50%",
+                    width: "200%",
+                    height: "200%",
+                    background: "conic-gradient(from 0deg, blue, green, red, orange, blue)",
+                    zIndex: 0,
+                  }}
+                />
+                <div className="card" style={{ position: "relative", zIndex: 1, height: "100%", margin: 0, border: "none", borderRadius: "calc(1rem - 4px)" }}>
+                  <h2 style={{ marginBottom: '0.75rem', fontSize: '1.25rem', fontWeight: 600 }}>Professional Summary</h2>
+                  <p style={{ color: "var(--text-secondary)", lineHeight: "1.6" }}>
+                    {results.summary || "No summary generated."}
+                  </p>
+                </div>
+              </div>
               <h2 style={{ marginBottom: '1rem', fontSize: '1.5rem', fontWeight: 600 }}>Top Matches for CV</h2>
-              {results.length === 0 ? (
+              {results.projects.length === 0 ? (
                 <div className="empty-state">
                   <AlertCircle size={48} className="empty-icon" />
                   <h3>No matching projects found</h3>
                   <p style={{ marginTop: '0.5rem' }}>Try refining your job description or checking the GitHub username.</p>
                 </div>
               ) : (
-                results.map((project, idx) => (
+                results.projects.map((project, idx) => (
                   <div key={idx} className="result-card" style={{ animationDelay: `${idx * 0.1}s` }}>
                     <div className="result-header">
                       <div className="result-title">
