@@ -1,16 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Loader2, User, Briefcase, ChevronRight, AlertCircle } from "lucide-react";
+import { Search, Loader2, User, Briefcase, AlertCircle } from "lucide-react";
 import { motion } from "framer-motion";
 
 type ProjectResult = {
   name: string;
   url: string;
   matchScore: number;
-  explanation: string;
+  whyItMatters: string;
+  cvBullets: string[];
   keyMetrics: string[];
-  };
+};
 
 type AnalysisResult = {
   summary: string;
@@ -161,11 +162,26 @@ export default function Home() {
                     </div>
                     
                     <div className="explanation">
-                      <ChevronRight size={16} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'text-bottom', color: 'var(--primary-color)' }} />
-                      {project.explanation}
+                      <div style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.25rem' }}>
+                        Why it matters:
+                      </div>
+                      <div>
+                        {project.whyItMatters}
+                      </div>
                     </div>
 
-                    <div className="metrics-container">
+                    <div className="cv-bullets" style={{ marginTop: '0.75rem', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+                      <div style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.25rem' }}>
+                        Suggested CV Bullets:
+                      </div>
+                      <ul style={{ paddingLeft: '1.25rem', margin: 0, listStyleType: 'disc' }}>
+                        {project.cvBullets.map((bullet, bltIdx) => (
+                          <li key={bltIdx} style={{ marginBottom: '0.25rem' }}>{bullet}</li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className="metrics-container" style={{ marginTop: '1rem' }}>
                       {project.keyMetrics.map((metric, mIdx) => (
                         <span key={mIdx} className="metric-badge">
                           {metric}

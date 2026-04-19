@@ -81,7 +81,7 @@ export async function POST(req: Request) {
             validRepos.push(repo);
           }
         }
-      } catch (e) {
+      } catch {
         console.error("Failed to fetch commits for repo", repo.name);
       }
     }
@@ -117,7 +117,7 @@ export async function POST(req: Request) {
           profileReadme = profileReadme.substring(0, 3000) + "...";
         }
       }
-    } catch (e) {
+    } catch {
       console.error("Failed to fetch profile README for", username);
     }
 
@@ -134,7 +134,8 @@ export async function POST(req: Request) {
 For each selected project, you must provide:
 - The project name and URL.
 - A match score out of 100 representing how well the project aligns with the job requirements.
-- A 1-2 sentence explanation of why this project should be highlighted on the CV for this specific role.
+- A 1-2 sentence explanation of why this project matters and should be highlighted on the CV for this specific role.
+- 2-3 suggested CV bullet points demonstrating the project's achievements, ready for the candidate to copy-paste into their resume. Focus on action verbs and outcomes relevant to the job.
 - 2-4 key metrics or skills demonstrated in the project that match the job description (e.g. "React", "REST API", "State Management").
 
 Additionally, you must provide a "Professional summary" that incorporates the candidate's skills, highlights the selected projects, perfectly aligns with the job description, and draws upon their Profile README if provided to capture their personal tone and background. IMPORTANT: Do NOT use academic or junior-level terminology such as "intern", "graduate", "student", etc. Focus solely on the characteristics in the projects that align with the job responsibilities and technical requirements. The summary should follow a tone similar to:
@@ -163,10 +164,11 @@ Additionally, you must provide a "Professional summary" that incorporates the ca
                     name: { type: "string" },
                     url: { type: "string" },
                     matchScore: { type: "number" },
-                    explanation: { type: "string" },
+                    whyItMatters: { type: "string" },
+                    cvBullets: { type: "array", items: { type: "string" } },
                     keyMetrics: { type: "array", items: { type: "string" } }
                   },
-                  required: ["name", "url", "matchScore", "explanation", "keyMetrics"],
+                  required: ["name", "url", "matchScore", "whyItMatters", "cvBullets", "keyMetrics"],
                   additionalProperties: false
                 }
               }
