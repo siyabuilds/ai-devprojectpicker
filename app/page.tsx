@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Loader2, User, Briefcase, AlertCircle } from "lucide-react";
+import { Search, Loader2, User, Briefcase, AlertCircle, CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
 import { motion } from "framer-motion";
 
 type ProjectResult = {
@@ -14,6 +14,7 @@ type ProjectResult = {
 };
 
 type AnalysisResult = {
+  verdict: string;
   summary: string;
   projects: ProjectResult[];
 };
@@ -46,7 +47,7 @@ export default function Home() {
       }
 
       const data = await response.json();
-      setResults({ summary: data.summary || "", projects: data.projects });
+      setResults({ verdict: data.verdict || "", summary: data.summary || "", projects: data.projects });
     } catch (err: Error | unknown) {
       setError(err instanceof Error ? err.message : "An unknown error occurred");
     } finally {
@@ -121,6 +122,27 @@ export default function Home() {
         <div>
           {results ? (
             <div className="results">
+              {results.verdict && (
+                <div style={{
+                  padding: "1rem", 
+                  marginBottom: "1rem", 
+                  borderRadius: "0.75rem", 
+                  background: results.verdict.includes("Strong") ? "rgba(34, 197, 94, 0.15)" : results.verdict.includes("Decent") ? "rgba(234, 179, 8, 0.15)" : "rgba(239, 68, 68, 0.15)",
+                  border: `1px solid ${results.verdict.includes("Strong") ? "rgba(34, 197, 94, 0.3)" : results.verdict.includes("Decent") ? "rgba(234, 179, 8, 0.3)" : "rgba(239, 68, 68, 0.3)"}`,
+                  color: "var(--text-primary)",
+                  fontWeight: 600,
+                  fontSize: "1.25rem",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "0.5rem"
+                }}>
+                  {results.verdict.includes("Strong") && <CheckCircle2 color="#22c55e" size={24} />}
+                  {results.verdict.includes("Decent") && <AlertTriangle color="#eab308" size={24} />}
+                  {results.verdict.includes("Weak") && <XCircle color="#ef4444" size={24} />}
+                  {results.verdict}
+                </div>
+              )}
               <div style={{ position: "relative", marginBottom: "0.5rem", borderRadius: "1rem", overflow: "hidden", padding: "4px" }}>
                 <motion.div
                   animate={{ rotate: 360 }}

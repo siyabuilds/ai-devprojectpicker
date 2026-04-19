@@ -138,7 +138,13 @@ For each selected project, you must provide:
 - 2-3 suggested CV bullet points demonstrating the project's achievements, ready for the candidate to copy-paste into their resume. Focus on action verbs and outcomes relevant to the job.
 - 2-4 key metrics or skills demonstrated in the project that match the job description (e.g. "React", "REST API", "State Management").
 
-Additionally, you must provide a "Professional summary" that incorporates the candidate's skills, highlights the selected projects, perfectly aligns with the job description, and draws upon their Profile README if provided to capture their personal tone and background. IMPORTANT: Do NOT use academic or junior-level terminology such as "intern", "graduate", "student", etc. Focus solely on the characteristics in the projects that align with the job responsibilities and technical requirements. The summary should follow a tone similar to:
+Additionally, you must provide two overall evaluations:
+1) A "verdict" which explicitly categorizes their overall fitness for this role based on their GitHub portfolio. You MUST choose exactly one of these three strings depending on how strong their repo match is:
+"Strong Fit for This Role"
+"Decent, but needs improvement"
+"Weak match — likely to struggle getting interviews"
+
+2) A "Professional summary" that incorporates the candidate's skills, highlights the selected projects, perfectly aligns with the job description, and draws upon their Profile README if provided to capture their personal tone and background. IMPORTANT: Do NOT use academic or junior-level terminology such as "intern", "graduate", "student", etc. Focus solely on the characteristics in the projects that align with the job responsibilities and technical requirements. The summary should follow a tone similar to:
 "Full stack developer specializing in building internal systems, workflow automation, and scalable software solutions. Proven ability to design and deliver tools that improve operational efficiency and reduce manual processes. Experienced in API integration, semantic search, and data-driven systems, with a strong focus on performance, usability, and real-world impact."`
         },
         {
@@ -155,6 +161,7 @@ Additionally, you must provide a "Professional summary" that incorporates the ca
           schema: {
             type: "object",
             properties: {
+              verdict: { type: "string" },
               summary: { type: "string" },
               projects: {
                 type: "array",
@@ -173,7 +180,7 @@ Additionally, you must provide a "Professional summary" that incorporates the ca
                 }
               }
             },
-            required: ["summary", "projects"],
+            required: ["verdict", "summary", "projects"],
             additionalProperties: false
           },
           strict: true
