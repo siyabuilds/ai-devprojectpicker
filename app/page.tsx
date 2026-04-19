@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Search, Loader2, User, Briefcase, AlertCircle, CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
 import { motion } from "framer-motion";
+import { ThemeToggle } from "./components/ThemeToggle";
 
 type ProjectResult = {
   name: string;
@@ -56,7 +57,10 @@ export default function Home() {
   };
 
   return (
-    <main className="container">
+    <main className="container" style={{ position: "relative" }}>
+      <div style={{ position: "absolute", top: "1rem", right: "1rem" }}>
+        <ThemeToggle />
+      </div>
       <div className="header">
         <h1>AI Project Picker</h1>
         <p>Optimize your CV by automatically matching your best GitHub projects against any job description.</p>
