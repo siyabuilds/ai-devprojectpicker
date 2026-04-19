@@ -1,4 +1,4 @@
-:root {
+:root, [data-theme="dark"] {
   --bg-color: #0B0F14;
   --card-bg: #111827;
   --text-primary: #E5E7EB;
@@ -8,6 +8,30 @@
   --accent-color: #22C55E;
   --warning-color: #F59E0B;
   --border-color: rgba(255, 255, 255, 0.1);
+  --input-bg: rgba(15, 23, 42, 0.5);
+  --btn-disabled-bg: #475569;
+  --explanation-bg: rgba(11, 15, 20, 0.6);
+  --badge-text: #94a3b8;
+  --empty-icon: #475569;
+  --font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-heading: var(--font-sora), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+[data-theme="light"] {
+  --bg-color: #F8FAFC;
+  --card-bg: #FFFFFF;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --primary-color: #2563eb;
+  --primary-hover: #1D4ED8;
+  --accent-color: #16A34A;
+  --warning-color: #D97706;
+  --border-color: rgba(0, 0, 0, 0.1);
+  --input-bg: rgba(255, 255, 255, 0.8);
+  --btn-disabled-bg: #cbd5e1;
+  --explanation-bg: rgba(241, 245, 249, 0.8);
+  --badge-text: #475569;
+  --empty-icon: #94a3b8;
   --font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-heading: var(--font-sora), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
@@ -100,7 +124,7 @@ body {
 
 .form-input, .form-textarea {
   width: 100%;
-  background: rgba(15, 23, 42, 0.5);
+  background: var(--input-bg);
   border: 1px solid var(--border-color);
   border-radius: 0.5rem;
   padding: 0.75rem 1rem;
@@ -147,7 +171,7 @@ body {
 }
 
 .btn:disabled {
-  background: #475569;
+  background: var(--btn-disabled-bg);
   cursor: not-allowed;
   opacity: 0.7;
 }
@@ -230,7 +254,7 @@ body {
   border-radius: 9999px;
   font-size: 0.85rem;
   font-weight: 500;
-  color: #94a3b8;
+  color: var(--badge-text);
   transition: all 0.2s ease;
 }
 
@@ -256,7 +280,7 @@ body {
 
 .empty-icon {
   margin-bottom: 1rem;
-  color: #475569;
+  color: var(--empty-icon);
 }
 
 .spinner {
@@ -269,7 +293,7 @@ body {
 }
 
 .explanation {
-  background: rgba(11, 15, 20, 0.6);
+  background: var(--explanation-bg);
   border-radius: 0.5rem;
   padding: 1rem 1.25rem;
   margin-top: 1rem;
