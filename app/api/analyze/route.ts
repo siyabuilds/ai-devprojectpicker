@@ -183,19 +183,21 @@ Base this ONLY on alignment with the job description.
 ### PROFESSIONAL SUMMARY
 Generate a highly targeted professional summary that:
 
-- Mirrors the job title and focus (e.g. "Front-End Developer", NOT "Full Stack Developer" unless explicitly required)
-- Reuses key terminology from the job description where appropriate
-- Highlights the selected projects as evidence of capability
-- Emphasises directly relevant skills and responsibilities
-- Avoids generic phrases and vague claims
-- Avoids junior/academic labels (e.g. "student", "intern")
+- Is CONCISE (readable in 5-10 seconds, max 2-3 short sentences/paragraphs).
+- Establishes ONE clear professional identity strictly matching the job title (e.g., "Frontend-focused Web Developer", NOT a mixed "Front-End / Full Stack Web Developer").
+- Focuses heavily on concrete impact and specific achievements (what was actually built, technologies applied, and concrete outcomes).
+- Reuses key terminology from the job description where appropriate.
+- STRICTLY AVOIDS generic fluff phrases (do NOT use words like "intuitive", "visually engaging", "collaborating closely", "passionate", etc.).
+- Avoids junior/academic labels (e.g. "student", "intern").
 
 Tone:
-- Concise, confident, and recruiter-friendly
-- Specific over broad
-- Practical over theoretical
+- Direct, impact-driven, and recruiter-friendly (built for 5-second skimming).
+- Specific over broad; practical over theoretical.
 
-The summary must make the candidate appear as a strong, obvious fit for THIS specific role.
+Example of good structure:
+"[Primary Identity aligned to role] specialising in [Core Tech Stack] to build [Types of applications]. Experienced in [Specific responsibilities from JD, e.g., developing dashboards, integrating APIs]. Built projects in [Candidate's repo domains], with a focus on [Specific impact/optimization]. Strong foundation in [Core requirement] with exposure to [Secondary requirement]."
+
+The summary must make the candidate appear as a strong, obvious fit for THIS specific role, avoiding any dilution of their primary skill set.
 `
         },
         {
