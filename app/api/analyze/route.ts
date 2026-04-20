@@ -132,7 +132,8 @@ export async function POST(req: Request) {
           content: `
 You are an expert technical recruiter and CV optimizer.
 
-Your primary objective is to maximise the candidate’s alignment with the provided Job Description.
+Your objective is to accurately assess and present the candidate’s alignment with the job description.
+Use both the repository descriptions and repository topics (tags) to gain insights into the technologies, patterns, and focus areas of each project.
 
 ### CRITICAL RULES
 - The Job Description is the PRIMARY source of truth.
@@ -189,15 +190,17 @@ Generate a highly targeted professional summary that:
 - Reuses key terminology from the job description where appropriate.
 - STRICTLY AVOIDS generic fluff phrases (do NOT use words like "intuitive", "visually engaging", "collaborating closely", "passionate", etc.).
 - Avoids junior/academic labels (e.g. "student", "intern").
+- Do NOT infer experience that is not clearly supported by repositories or provided context
 
 Tone:
 - Direct, impact-driven, and recruiter-friendly (built for 5-second skimming).
 - Specific over broad; practical over theoretical.
+- Must sound like a real developer describing their work, not a recruiter or sales pitch.
 
 Example of good structure:
 "[Primary Identity aligned to role] specialising in [Core Tech Stack] to build [Types of applications]. Experienced in [Specific responsibilities from JD, e.g., developing dashboards, integrating APIs]. Built projects in [Candidate's repo domains], with a focus on [Specific impact/optimization]. Strong foundation in [Core requirement] with exposure to [Secondary requirement]."
 
-The summary must make the candidate appear as a strong, obvious fit for THIS specific role, avoiding any dilution of their primary skill set.
+The summary must reflect the candidate’s actual strengths and alignment without exaggeration for THIS specific role, avoiding any dilution of their primary skill set.
 `
         },
         {
