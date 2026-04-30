@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Loader2, User, Briefcase, AlertCircle, CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
+import { Search, Loader2, User, Briefcase, AlertCircle, CheckCircle2, AlertTriangle, XCircle, Copy, Check } from "lucide-react";
 import { motion } from "framer-motion";
 import { ThemeToggle } from "./components/ThemeToggle";
 
@@ -26,6 +26,15 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isCopied, setIsCopied] = useState(false);
+
+  const handleCopy = () => {
+    if (results?.summary) {
+      navigator.clipboard.writeText(results.summary);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    }
+  };
 
   const handleAnalyze = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -162,7 +171,29 @@ export default function Home() {
                   }}
                 />
                 <div className="card" style={{ position: "relative", zIndex: 1, height: "100%", margin: 0, border: "none", borderRadius: "calc(1rem - 4px)" }}>
-                  <h2 style={{ marginBottom: '0.75rem', fontSize: '1.25rem', fontWeight: 600 }}>Professional Summary</h2>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                    <h2 style={{ fontSize: '1.25rem', fontWeight: 600, margin: 0 }}>Professional Summary</h2>
+                    <button
+                      onClick={handleCopy}
+                      title="Copy professional summary"
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        color: 'var(--text-secondary)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: '0.25rem',
+                        borderRadius: '0.25rem',
+                        transition: 'background-color 0.2s',
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-secondary)'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                    >
+                      {isCopied ? <Check size={18} className="text-green-500" /> : <Copy size={18} />}
+                    </button>
+                  </div>
                   <p style={{ color: "var(--text-secondary)", lineHeight: "1.6" }}>
                     {results.summary || "No summary generated."}
                   </p>
