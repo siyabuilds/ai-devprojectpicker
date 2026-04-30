@@ -57,47 +57,81 @@ export async function POST(req: Request) {
       return NextResponse.json({ projects: [], summary: "" });
     }
 
-    // Filter 1: Must have a live link / deployed demo
-    const reposWithDemo = allRepos.filter(
-      (repo: GitHubRepo) => (repo.homepage && repo.homepage.trim() !== "") || repo.has_pages
-    );
-
-    // Filter 2: Must have at least 5+ commits
-    const validRepos: GitHubRepo[] = [];
-    for (const repo of reposWithDemo) {
-      try {
-        const commitRes = await fetch(
-          `https://api.github.com/repos/${username}/${repo.name}/commits?per_page=5`,
-          {
-            headers: {
-              Authorization: `Bearer ${githubApiKey}`,
-              Accept: "application/vnd.github.v3+json",
-            },
-          }
-        );
-        if (commitRes.ok) {
+    // Filter 1: Must have at least 5+ commits
+    const commitChecks = await Promise.all(
+      allRepos.map(async (repo: GitHubRepo) => {
+        try {
+          const commitRes = await fetch(
+            `https://api.github.com/repos/${username}/${repo.name}/commits?per_page=5`,
+            {
+              headers: {
+                Authorization: `Bearer ${githubApiKey}`,
+                Accept: "application/vnd.github.v3+json",
+              },
+            }
+          );
+          if (!commitRes.ok) return null;
           const commits = await commitRes.json();
-          if (Array.isArray(commits) && commits.length >= 5) {
-            validRepos.push(repo);
-          }
+          return Array.isArray(commits) && commits.length >= 5 ? repo : null;
+        } catch {
+          console.error("Failed to fetch commits for repo", repo.name);
+          return null;
         }
-      } catch {
-        console.error("Failed to fetch commits for repo", repo.name);
-      }
-    }
+      })
+    );
+    const validRepos: GitHubRepo[] = commitChecks.filter((r): r is GitHubRepo => r !== null);
 
     if (validRepos.length === 0) {
       return NextResponse.json({ projects: [], summary: "" });
     }
 
-    // Filter relevant fields to save tokens
-    const repoSummaries = validRepos.map((repo: GitHubRepo) => ({
-      name: repo.name,
-      description: repo.description || "No description",
-      language: repo.language,
-      url: repo.html_url,
-      topics: repo.topics || [],
-    }));
+    // Filter 2: Must have a description or a README.
+    // If both exist, use README (truncated). If only description, use description.
+    const repoSummariesRaw = await Promise.all(
+      validRepos.map(async (repo) => {
+        let readmeContent = "";
+        try {
+          const readmeRes = await fetch(
+            `https://api.github.com/repos/${username}/${repo.name}/readme`,
+            {
+              headers: {
+                Authorization: `Bearer ${githubApiKey}`,
+                Accept: "application/vnd.github.v3.raw",
+              },
+            }
+          );
+          if (readmeRes.ok) {
+            readmeContent = await readmeRes.text();
+            // Limit to lower AI API costs
+            if (readmeContent.length > 1000) {
+              readmeContent = readmeContent.substring(0, 1000) + "...";
+            }
+          }
+        } catch (err) {
+          console.error("Failed to fetch README for repo", repo.name);
+        }
+
+        const hasReadme = readmeContent.trim().length > 0;
+        const hasDescription = repo.description && typeof repo.description === 'string' && repo.description.trim() !== "";
+
+        if (!hasReadme && !hasDescription) {
+          return null;
+        }
+
+        return {
+          name: repo.name,
+          description: hasReadme ? readmeContent : repo.description,
+          language: repo.language,
+          url: repo.html_url,
+          topics: repo.topics || [],
+        };
+      })
+    );
+    const repoSummaries = repoSummariesRaw.filter(Boolean);
+
+    if (repoSummaries.length === 0) {
+      return NextResponse.json({ projects: [], summary: "" });
+    }
 
     // Fetch user's profile README if it exists
     let profileReadme = "";
@@ -123,6 +157,8 @@ export async function POST(req: Request) {
 
     // 2. Call OpenAI API for comparison
     const openai = new OpenAI({ apiKey: openaiApiKey });
+
+    const topRepos = repoSummaries.slice(0, 10);
 
     const completion = await openai.chat.completions.create({
       model: "gpt-5.1", // Using high performance model for best reasoning
@@ -207,7 +243,7 @@ The summary must reflect the candidate’s actual strengths and alignment withou
           role: "user",
           content: `Job Description:\n${jobDescription}\n` +
             (profileReadme ? `\nCandidate's Profile README:\n${profileReadme}\n` : "") +
-            `\nCandidate's Repositories:\n${JSON.stringify(repoSummaries, null, 2)}`
+            `\nCandidate's Repositories:\n${JSON.stringify(topRepos, null, 2)}`
         }
       ],
       response_format: {
