@@ -16,6 +16,7 @@ type ProjectResult = {
 
 type AnalysisResult = {
   verdict: string;
+  roleRelevancePercentage: number;
   summary: string;
   projects: ProjectResult[];
 };
@@ -57,7 +58,7 @@ export default function Home() {
       }
 
       const data = await response.json();
-      setResults({ verdict: data.verdict || "", summary: data.summary || "", projects: data.projects });
+      setResults({ verdict: data.verdict || "", roleRelevancePercentage: data.roleRelevancePercentage || 0, summary: data.summary || "", projects: data.projects });
     } catch (err: Error | unknown) {
       setError(err instanceof Error ? err.message : "An unknown error occurred");
     } finally {
@@ -147,13 +148,26 @@ export default function Home() {
                   fontSize: "1.25rem",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center",
+                  justifyContent: "space-between",
                   gap: "0.5rem"
                 }}>
-                  {results.verdict.includes("Strong") && <CheckCircle2 color="#22c55e" size={24} />}
-                  {results.verdict.includes("Decent") && <AlertTriangle color="#eab308" size={24} />}
-                  {results.verdict.includes("Weak") && <XCircle color="#ef4444" size={24} />}
-                  {results.verdict}
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    {results.verdict.includes("Strong") && <CheckCircle2 color="#22c55e" size={24} />}
+                    {results.verdict.includes("Decent") && <AlertTriangle color="#eab308" size={24} />}
+                    {results.verdict.includes("Weak") && <XCircle color="#ef4444" size={24} />}
+                    {results.verdict}
+                  </div>
+                  {results.roleRelevancePercentage !== undefined && (
+                    <div style={{
+                      background: "rgba(0, 0, 0, 0.1)",
+                      padding: "0.25rem 0.75rem",
+                      borderRadius: "0.5rem",
+                      fontSize: "1.125rem",
+                      fontWeight: 700
+                    }}>
+                      {results.roleRelevancePercentage}%
+                    </div>
+                  )}
                 </div>
               )}
               <div style={{ position: "relative", marginBottom: "0.5rem", borderRadius: "1rem", overflow: "hidden", padding: "4px" }}>

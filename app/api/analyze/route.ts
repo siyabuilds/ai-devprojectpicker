@@ -214,6 +214,7 @@ Choose EXACTLY one:
 - "Weak match — likely to struggle getting interviews"
 
 Base this ONLY on alignment with the job description.
+Also, provide an overall role match score (0-100) under roleRelevancePercentage.
 
 ---
 
@@ -254,6 +255,7 @@ The summary must reflect the candidate’s actual strengths and alignment withou
             type: "object",
             properties: {
               verdict: { type: "string" },
+              roleRelevancePercentage: { type: "number" },
               summary: { type: "string" },
               projects: {
                 type: "array",
@@ -272,7 +274,7 @@ The summary must reflect the candidate’s actual strengths and alignment withou
                 }
               }
             },
-            required: ["verdict", "summary", "projects"],
+            required: ["verdict", "roleRelevancePercentage", "summary", "projects"],
             additionalProperties: false
           },
           strict: true
