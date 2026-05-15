@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, Loader2, User, Briefcase, AlertCircle, CheckCircle2, AlertTriangle, XCircle, Copy, Check } from "lucide-react";
 import { motion } from "framer-motion";
 import { ThemeToggle } from "./components/ThemeToggle";
@@ -28,6 +28,24 @@ export default function Home() {
   const [results, setResults] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isCopied, setIsCopied] = useState(false);
+
+  useEffect(() => {
+    const handleDocumentCopy = (e: ClipboardEvent) => {
+      const selection = window.getSelection()?.toString();
+
+      if (!selection) return;
+
+      e.preventDefault();
+
+      e.clipboardData?.setData("text/plain", selection);
+    };
+
+    document.addEventListener("copy", handleDocumentCopy);
+
+    return () => {
+      document.removeEventListener("copy", handleDocumentCopy);
+    };
+  }, []);
 
   const handleCopy = () => {
     if (results?.summary) {
