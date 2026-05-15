@@ -111,6 +111,33 @@ export async function POST(req: Request) {
           console.error("Failed to fetch README for repo", repo.name);
         }
 
+        let languagesStr = "";
+        try {
+          const langRes = await fetch(
+            `https://api.github.com/repos/${username}/${repo.name}/languages`,
+            {
+              headers: {
+                Authorization: `Bearer ${githubApiKey}`,
+                Accept: "application/vnd.github.v3+json",
+              },
+            }
+          );
+          if (langRes.ok) {
+            const languages = await langRes.json();
+            const totalBytes = Object.values(languages).reduce((sum: number, val: unknown) => sum + (val as number), 0) as number;
+            
+            if (totalBytes > 0) {
+              const langPercentages = Object.entries(languages).map(([lang, bytes]) => {
+                const percentage = (((bytes as number) / totalBytes) * 100).toFixed(1);
+                return `${lang}: ${percentage}%`;
+              });
+              languagesStr = langPercentages.join(", ");
+            }
+          }
+        } catch (err) {
+          console.error("Failed to fetch languages for repo", repo.name);
+        }
+
         const hasReadme = readmeContent.trim().length > 0;
         const hasDescription = repo.description && typeof repo.description === 'string' && repo.description.trim() !== "";
 
@@ -121,7 +148,7 @@ export async function POST(req: Request) {
         return {
           name: repo.name,
           description: hasReadme ? readmeContent : repo.description,
-          language: repo.language,
+          languageStats: languagesStr,
           url: repo.html_url,
           topics: repo.topics || [],
         };
@@ -176,6 +203,7 @@ Use both the repository descriptions and repository topics (tags) to gain insigh
 - Candidate repositories are SUPPORTING evidence only.
 - If there is any conflict between repo signals and job requirements, ALWAYS prioritise the Job Description.
 - Do NOT include skills, roles, or labels that are not relevant to the job description.
+- Use the strictly quantified "languageStats" from the repository to understand the tech stack breakdown (e.g. "TypeScript: 85.0%") instead of purely relying on topics or README mentions.
 
 ---
 
