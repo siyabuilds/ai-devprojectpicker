@@ -20,8 +20,8 @@ export function AnalysisForm({ onAnalyze, loading, error }: AnalysisFormProps) {
   };
 
   return (
-    <div className="p-8 bg-white dark:bg-zinc-900/50 backdrop-blur-2xl rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
-      <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+    <div className="p-6 md:p-8 bg-white dark:bg-zinc-900/50 backdrop-blur-2xl rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-5 md:gap-6">
         <div>
           <label htmlFor="username" className="flex items-center gap-2 text-sm font-medium mb-2 text-zinc-600 dark:text-zinc-300">
             <User className="w-4 h-4" />

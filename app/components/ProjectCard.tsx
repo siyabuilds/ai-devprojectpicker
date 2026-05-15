@@ -15,10 +15,10 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1 }}
-      className="p-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl shadow-sm hover:shadow-md transition-all group"
+      className="p-5 sm:p-6 md:p-8 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl shadow-sm hover:shadow-md transition-all group"
     >
-      <div className="flex justify-between items-start mb-4">
-        <a href={project.url} target="_blank" rel="noreferrer" className="font-display font-semibold text-lg hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4">
+        <a href={project.url} target="_blank" rel="noreferrer" className="break-all font-display font-semibold text-lg hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2">
           {project.name}
           <svg className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />

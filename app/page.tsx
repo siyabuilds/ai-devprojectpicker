@@ -79,7 +79,7 @@ export default function Home() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           
           {/* Input Form Column */}
-          <div className="lg:col-span-5 h-fit sticky top-24">
+          <div className="lg:col-span-5 h-fit lg:sticky lg:top-24 mb-8 lg:mb-0">
             <AnalysisForm onAnalyze={handleAnalyze} loading={loading} error={error} />
           </div>
 

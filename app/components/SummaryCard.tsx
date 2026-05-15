@@ -31,7 +31,7 @@ export function SummaryCard({ summary }: SummaryCardProps) {
   };
 
   return (
-    <div className="group relative bg-zinc-50 dark:bg-zinc-900/60 rounded-3xl p-8 border border-zinc-200 dark:border-zinc-800">
+    <div className="group relative bg-zinc-50 dark:bg-zinc-900/60 rounded-3xl p-6 md:p-8 border border-zinc-200 dark:border-zinc-800">
       <div className="flex justify-between items-start mb-4">
         <h3 className="font-medium text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
           Professional Summary
