@@ -18,15 +18,8 @@ export function SkillGroupingsCard({ skillGroupings }: SkillGroupingsCardProps) 
             <span className="font-semibold text-zinc-800 dark:text-zinc-200 min-w-[100px]">
               {group.category}:
             </span>
-            <div className="flex flex-wrap gap-2">
-              {group.skills.map((skill, skillIdx) => (
-                <span 
-                  key={skillIdx}
-                  className="px-2 py-1 text-sm bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 rounded-none border border-zinc-200 dark:border-zinc-700"
-                >
-                  {skill}
-                </span>
-              ))}
+            <div className="flex-1 text-zinc-700 dark:text-zinc-300">
+              {group.skills.join(", ")}
             </div>
           </div>
         ))}
