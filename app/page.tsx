@@ -10,6 +10,7 @@ import { EmptyState } from "./components/EmptyState";
 import { LoadingState } from "./components/LoadingState";
 import { VerdictCard } from "./components/VerdictCard";
 import { SummaryCard } from "./components/SummaryCard";
+import { SkillGroupingsCard } from "./components/SkillGroupingsCard";
 import { ProjectCard } from "./components/ProjectCard";
 import { AnalysisResult } from "./types";
 
@@ -39,7 +40,8 @@ export default function Home() {
       setResults({ 
         verdict: data.verdict || "", 
         roleRelevancePercentage: data.roleRelevancePercentage || 0, 
-        summary: data.summary || "", 
+        summary: data.summary || "",
+        skillGroupings: data.skillGroupings || [],
         projects: data.projects 
       });
     } catch (err: Error | unknown) {
@@ -104,6 +106,10 @@ export default function Home() {
 
                   {results.summary && (
                     <SummaryCard summary={results.summary} />
+                  )}
+
+                  {results.skillGroupings && results.skillGroupings.length > 0 && (
+                    <SkillGroupingsCard skillGroupings={results.skillGroupings} />
                   )}
 
                   {results.projects?.length > 0 && (
