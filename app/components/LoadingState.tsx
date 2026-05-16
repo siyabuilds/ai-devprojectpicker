@@ -8,7 +8,7 @@ export function LoadingState() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="min-h-[300px] lg:h-[400px] flex flex-col items-center justify-center gap-6 rounded-3xl p-6 lg:p-8"
+      className="min-h-[300px] lg:h-[400px] flex flex-col items-center justify-center gap-6 rounded-none p-6 lg:p-8"
     >
       <div className="relative w-16 h-16">
         <div className="absolute inset-0 border-4 border-zinc-200 dark:border-zinc-800 rounded-full" />

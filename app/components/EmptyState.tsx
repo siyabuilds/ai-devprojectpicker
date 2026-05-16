@@ -9,7 +9,7 @@ export function EmptyState() {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
-      className="min-h-[300px] lg:h-[400px] flex flex-col items-center justify-center gap-4 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 lg:p-8 text-center text-zinc-500"
+      className="min-h-[300px] lg:h-[400px] flex flex-col items-center justify-center gap-4 border border-dashed border-zinc-200/50 dark:border-zinc-800/50 bg-white/20 dark:bg-zinc-900/20 backdrop-blur-md p-6 lg:p-8 text-center text-zinc-500 rounded-none"
     >
       <Search className="w-12 h-12 text-zinc-300 dark:text-zinc-700" />
       <div>

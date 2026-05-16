@@ -15,7 +15,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1 }}
-      className="p-5 sm:p-6 md:p-8 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl shadow-sm hover:shadow-md transition-all group"
+      className="p-5 sm:p-6 md:p-8 bg-white/40 dark:bg-zinc-900/40 backdrop-blur-xl border border-white/20 dark:border-zinc-700/50 rounded-none shadow-lg hover:shadow-xl transition-all group"
     >
       <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4">
         <a href={project.url} target="_blank" rel="noreferrer" className="break-all font-display font-semibold text-lg hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2">
@@ -24,7 +24,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
             <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
           </svg>
         </a>
-        <span className="px-3 py-1 bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 font-semibold text-sm rounded-full border border-green-200 dark:border-green-500/20">
+        <span className="px-3 py-1 bg-green-50/50 dark:bg-green-500/10 backdrop-blur-sm text-green-700 dark:text-green-400 font-semibold text-sm rounded-none border border-green-200/50 dark:border-green-500/20">
           {project.matchScore}% Match
         </span>
       </div>
@@ -49,7 +49,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
         <h4 className="text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-3">Matched Skills</h4>
         <div className="flex flex-wrap gap-2">
           {project.keyMetrics.map((metric, i) => (
-            <span key={i} className="px-3 py-1 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 text-xs font-medium rounded-lg border border-zinc-200 dark:border-zinc-700">
+            <span key={i} className="px-3 py-1 bg-zinc-100/50 dark:bg-zinc-800/50 backdrop-blur-sm text-zinc-600 dark:text-zinc-300 text-xs font-medium rounded-none border border-zinc-200/50 dark:border-zinc-700/50">
               {metric}
             </span>
           ))}

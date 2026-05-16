@@ -109,7 +109,7 @@ export default function Home() {
                   {results.projects?.length > 0 && (
                     <div className="flex flex-col gap-6">
                       <h3 className="font-medium text-zinc-900 dark:text-zinc-100 px-2 flex items-center gap-2">
-                        <span className="flex w-6 h-6 rounded-full bg-zinc-200 dark:bg-zinc-800 items-center justify-center text-xs font-semibold">{results.projects.length}</span>
+                        <span className="flex w-6 h-6 rounded-none bg-zinc-200/50 dark:bg-zinc-800/50 backdrop-blur-sm border border-black/10 dark:border-white/10 items-center justify-center text-xs font-semibold">{results.projects.length}</span>
                         Highlighted Projects
                       </h3>
                       
