@@ -107,7 +107,7 @@ export async function POST(req: Request) {
               readmeContent = readmeContent.substring(0, 1000) + "...";
             }
           }
-        } catch (err) {
+        } catch {
           console.error("Failed to fetch README for repo", repo.name);
         }
 
@@ -134,7 +134,7 @@ export async function POST(req: Request) {
               languagesStr = langPercentages.join(", ");
             }
           }
-        } catch (err) {
+        } catch {
           console.error("Failed to fetch languages for repo", repo.name);
         }
 
@@ -266,6 +266,11 @@ Example of good structure:
 "[Primary Identity aligned to role] specialising in [Core Tech Stack] to build [Types of applications]. Experienced in [Specific responsibilities from JD, e.g., developing dashboards, integrating APIs]. Built projects in [Candidate's repo domains], with a focus on [Specific impact/optimization]. Strong foundation in [Core requirement] with exposure to [Secondary requirement]."
 
 The summary must reflect the candidate’s actual strengths and alignment without exaggeration for THIS specific role, avoiding any dilution of their primary skill set.
+
+### SKILL GROUPINGS
+Analyze the skills overlapping between the candidate's projects and the job requirements.
+Group them logically by domain (e.g., "Frontend", "Backend", "Databases", "Tools" - or generate other relevant categories based on the actual skills).
+Only include skills that the candidate has demonstrated in their repositories which are ALSO relevant to the job requirements.
 `
         },
         {
@@ -285,6 +290,18 @@ The summary must reflect the candidate’s actual strengths and alignment withou
               verdict: { type: "string" },
               roleRelevancePercentage: { type: "number" },
               summary: { type: "string" },
+              skillGroupings: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    category: { type: "string" },
+                    skills: { type: "array", items: { type: "string" } }
+                  },
+                  required: ["category", "skills"],
+                  additionalProperties: false
+                }
+              },
               projects: {
                 type: "array",
                 items: {
@@ -302,7 +319,7 @@ The summary must reflect the candidate’s actual strengths and alignment withou
                 }
               }
             },
-            required: ["verdict", "roleRelevancePercentage", "summary", "projects"],
+            required: ["verdict", "roleRelevancePercentage", "summary", "skillGroupings", "projects"],
             additionalProperties: false
           },
           strict: true

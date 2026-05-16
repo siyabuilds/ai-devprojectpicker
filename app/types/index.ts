@@ -11,5 +11,6 @@ export type AnalysisResult = {
   verdict: string;
   roleRelevancePercentage: number;
   summary: string;
+  skillGroupings: { category: string; skills: string[] }[];
   projects: ProjectResult[];
 };
