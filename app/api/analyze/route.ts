@@ -9,6 +9,10 @@ interface GitHubRepo {
   language?: string | null;
   html_url: string;
   topics?: string[];
+  updated_at?: string;
+  pushed_at?: string;
+  stargazers_count?: number;
+  forks_count?: number;
   [key: string]: unknown;
 }
 
@@ -57,39 +61,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ projects: [], summary: "" });
     }
 
-    // Filter 1: Must have at least 5+ commits
-    const commitChecks = await Promise.all(
+    // 2. Score repositories based on quality signals
+    const scoredRepos = await Promise.all(
       allRepos.map(async (repo: GitHubRepo) => {
-        try {
-          const commitRes = await fetch(
-            `https://api.github.com/repos/${username}/${repo.name}/commits?per_page=5`,
-            {
-              headers: {
-                Authorization: `Bearer ${githubApiKey}`,
-                Accept: "application/vnd.github.v3+json",
-              },
-            }
-          );
-          if (!commitRes.ok) return null;
-          const commits = await commitRes.json();
-          return Array.isArray(commits) && commits.length >= 5 ? repo : null;
-        } catch {
-          console.error("Failed to fetch commits for repo", repo.name);
-          return null;
-        }
-      })
-    );
-    const validRepos: GitHubRepo[] = commitChecks.filter((r): r is GitHubRepo => r !== null);
-
-    if (validRepos.length === 0) {
-      return NextResponse.json({ projects: [], summary: "" });
-    }
-
-    // Filter 2: Must have a description or a README.
-    // If both exist, use README (truncated). If only description, use description.
-    const repoSummariesRaw = await Promise.all(
-      validRepos.map(async (repo) => {
         let readmeContent = "";
+        let hasReadme = false;
         try {
           const readmeRes = await fetch(
             `https://api.github.com/repos/${username}/${repo.name}/readme`,
@@ -102,6 +78,7 @@ export async function POST(req: Request) {
           );
           if (readmeRes.ok) {
             readmeContent = await readmeRes.text();
+            hasReadme = readmeContent.trim().length > 0;
             // Limit to lower AI API costs
             if (readmeContent.length > 1000) {
               readmeContent = readmeContent.substring(0, 1000) + "...";
@@ -111,6 +88,106 @@ export async function POST(req: Request) {
           console.error("Failed to fetch README for repo", repo.name);
         }
 
+        let moreThan20Commits = false;
+        try {
+          const commitRes = await fetch(
+            `https://api.github.com/repos/${username}/${repo.name}/commits?per_page=21`,
+            {
+              headers: {
+                Authorization: `Bearer ${githubApiKey}`,
+                Accept: "application/vnd.github.v3+json",
+              },
+            }
+          );
+          if (commitRes.ok) {
+            const commits = await commitRes.json();
+            moreThan20Commits = Array.isArray(commits) && commits.length >= 21;
+          }
+        } catch {
+          console.error("Failed to fetch commits for repo", repo.name);
+        }
+
+        let multipleContributors = false;
+        try {
+          const contributorRes = await fetch(
+            `https://api.github.com/repos/${username}/${repo.name}/contributors?per_page=2`,
+            {
+              headers: {
+                Authorization: `Bearer ${githubApiKey}`,
+                Accept: "application/vnd.github.v3+json",
+              },
+            }
+          );
+          if (contributorRes.ok) {
+            const contributors = await contributorRes.json();
+            multipleContributors = Array.isArray(contributors) && contributors.length >= 2;
+          }
+        } catch {
+          console.error("Failed to fetch contributors for repo", repo.name);
+        }
+
+        // Check update date within 90 days
+        let updatedWithin90Days = false;
+        const updatedAtStr = repo.updated_at || repo.pushed_at;
+        if (typeof updatedAtStr === "string") {
+          const updatedAt = new Date(updatedAtStr);
+          const ninetyDaysAgo = new Date();
+          ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+          updatedWithin90Days = updatedAt >= ninetyDaysAgo;
+        }
+
+        const hasDescription = repo.description && typeof repo.description === "string" && repo.description.trim() !== "";
+        const hasTopics = repo.topics && Array.isArray(repo.topics) && repo.topics.length > 0;
+        const hasHomepage = repo.homepage && typeof repo.homepage === "string" && repo.homepage.trim() !== "";
+        const hasGithubPages = repo.has_pages === true;
+        const stars = typeof repo.stargazers_count === "number" ? repo.stargazers_count : 0;
+        const forks = typeof repo.forks_count === "number" ? repo.forks_count : 0;
+
+        // Scoring rules:
+        // README exists: +10
+        // Description exists: +5
+        // Has Topics: +10
+        // Has Homepage: +15
+        // Has GitHub Pages: +15
+        // Updated within 90 days: +15
+        // >20 commits: +15
+        // Multiple contributors: +10
+        // Stars: +5
+        // Forks: +5
+        const score = 
+          (hasReadme ? 10 : 0) +
+          (hasDescription ? 5 : 0) +
+          (hasTopics ? 10 : 0) +
+          (hasHomepage ? 15 : 0) +
+          (hasGithubPages ? 15 : 0) +
+          (updatedWithin90Days ? 15 : 0) +
+          (moreThan20Commits ? 15 : 0) +
+          (multipleContributors ? 10 : 0) +
+          (stars > 0 ? 5 : 0) +
+          (forks > 0 ? 5 : 0);
+
+        return {
+          repo,
+          score,
+          readmeContent,
+          hasReadme,
+          hasDescription
+        };
+      })
+    );
+
+    // Filter by score >= 25 and sort by score descending
+    const validScoredRepos = scoredRepos
+      .filter((item) => item.score >= 25)
+      .sort((a, b) => b.score - a.score);
+
+    if (validScoredRepos.length === 0) {
+      return NextResponse.json({ projects: [], summary: "" });
+    }
+
+    // 3. Fetch languages for the valid repositories only and build repoSummaries
+    const repoSummariesRaw = await Promise.all(
+      validScoredRepos.map(async ({ repo, readmeContent, hasReadme }) => {
         let languagesStr = "";
         try {
           const langRes = await fetch(
@@ -138,16 +215,9 @@ export async function POST(req: Request) {
           console.error("Failed to fetch languages for repo", repo.name);
         }
 
-        const hasReadme = readmeContent.trim().length > 0;
-        const hasDescription = repo.description && typeof repo.description === 'string' && repo.description.trim() !== "";
-
-        if (!hasReadme && !hasDescription) {
-          return null;
-        }
-
         return {
           name: repo.name,
-          description: hasReadme ? readmeContent : repo.description,
+          description: (hasReadme ? readmeContent : repo.description) || "",
           languageStats: languagesStr,
           url: repo.html_url,
           topics: repo.topics || [],
@@ -185,7 +255,7 @@ export async function POST(req: Request) {
     // 2. Call OpenAI API for comparison
     const openai = new OpenAI({ apiKey: openaiApiKey });
 
-    const topRepos = repoSummaries.slice(0, 10);
+    const topRepos = repoSummaries.slice(0, 5);
 
     const completion = await openai.chat.completions.create({
       model: "gpt-5.1", // Using high performance model for best reasoning
@@ -269,8 +339,9 @@ The summary must reflect the candidate’s actual strengths and alignment withou
 
 ### SKILL GROUPINGS
 Analyze the skills overlapping between the candidate's projects and the job requirements.
-Group them logically by domain (e.g., "Frontend", "Backend", "Databases", "Tools" - or generate other relevant categories based on the actual skills).
+Group them logically by domain (e.g., "Languages", "Frontend", "Backend", "Databases", "Tools" - or generate other relevant categories based on the actual skills).
 Only include skills that the candidate has demonstrated in their repositories which are ALSO relevant to the job requirements.
+IMPORTANT: Do NOT list highly redundant skills or an exhaustive dump of everything they know. Consolidate them for impact, preferring broad impact over quantity. For example, combine CSS3, Tailwind CSS, and SCSS into a single "CSS" skill. Only include things that suggest they are a builder. Keep it extremely concise and avoid redundancy.
 `
         },
         {
