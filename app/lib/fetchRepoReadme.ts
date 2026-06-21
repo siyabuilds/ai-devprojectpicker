@@ -1,26 +1,10 @@
-import { githubFetch } from "./githubclient";
-import { GitHubReadmeResponse } from "../types/github";
+import { fetchRawReadme } from "./fetchRawReadme";
 
-export async function fetchRepoReadme(
+// fetchRepoReadme just calls fetchRawReadme so we dont have to change the logic
+export function fetchRepoReadme(
     username: string,
     repo: string,
-    maxLength = 3000,
-): Promise<string> {
-    try {
-        const data = await githubFetch<GitHubReadmeResponse>(
-            `/repos/${username}/${repo}/readme`,
-        );
-
-        if (!data || !data.content) {
-            return "";
-        }
-
-        const readme = Buffer.from(data.content, "base64").toString("utf-8");
-
-        return readme.length > maxLength
-            ? readme.substring(0, maxLength) + "..."
-            : readme;
-    } catch {
-        return "";
-    }
+    maxLength?: number,
+) {
+    return fetchRawReadme(username, repo, maxLength);
 }
