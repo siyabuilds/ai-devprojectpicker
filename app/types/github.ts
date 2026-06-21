@@ -64,3 +64,9 @@ export interface EnrichedRepo {
 
   updatedAt: string;
 }
+
+// GitHubReadmeResponse represents the response structure for fetching a repository README.
+export interface GitHubReadmeResponse {
+  content: string;
+  encoding: string;
+}
